@@ -1,0 +1,19 @@
+---
+description: Protect splash screen implementation from accidental edits
+alwaysApply: true
+---
+
+# Splash Screen Protection
+
+- Treat the splash-screen implementation as locked by default.
+- Do not modify splash-related code unless the user explicitly requests splash changes.
+- Protected files:
+  - `index.html` (splash markup)
+  - `styles/main.css` (splash styles/animations)
+  - `js/main.js` (splash timing/exit logic)
+- When editing these files for unrelated work, preserve all splash behavior exactly:
+  - Black full-screen overlay on load
+  - Centered "Jamie Setch" text
+  - 1 second hold before exit
+  - "Jamie" moves left and "Setch" moves right
+  - Splash fades out into the page

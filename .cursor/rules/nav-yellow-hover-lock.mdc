@@ -1,0 +1,23 @@
+---
+description: Preserve yellow hover-box effect on header nav links
+alwaysApply: true
+---
+
+# Header Nav Yellow Hover Lock
+
+- Treat the yellow hover-box effect on the center header links as protected.
+- Do not remove, restyle, or weaken this behavior unless the user explicitly asks.
+- Protected target selectors:
+  - `.main-nav a`
+  - `.main-nav a::before`
+  - `.main-nav a::after`
+  - `.main-nav a:hover`
+  - `.main-nav a:focus-visible`
+  - `.main-nav a:hover::before`
+  - `.main-nav a:hover::after`
+  - `.main-nav a:focus-visible::before`
+  - `.main-nav a:focus-visible::after`
+- Required behavior to preserve:
+  - Link text turns yellow on hover/focus
+  - Animated yellow outline/corner box appears around each nav link
+  - Smooth transition timing remains in place

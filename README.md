@@ -1,5 +1,22 @@
-# jamie-setch-band-website
- 
-To change things about the site such as, the socials displayed at the top or the merch go to
-the items folder and change the appropriate values.
-All paths to images are referenced from the rendered directory
+# Jamie Setch Website (Rebuild)
+
+Fresh frontend workspace for a full rebuild.
+
+## Structure
+
+- `index.html` - Main page entry point
+- `styles/main.css` - Global styles
+- `js/main.js` - Frontend behavior
+- `old/` - Backup of the previous website code and assets
+
+## Run locally
+
+Use any static server from this folder. For example:
+
+```bash
+python3 -m http.server 8000
+```
+
+Then open:
+
+http://localhost:8000
