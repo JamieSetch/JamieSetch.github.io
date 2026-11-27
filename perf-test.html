@@ -64,6 +64,30 @@
             }, 4000);
           }, 1000);
         }
+        // ?monitor: a live readout of frame timing over the last 10 seconds, readable in a screenshot
+        if (new URLSearchParams(location.search).has("monitor")) {
+          const fl = new URLSearchParams(location.search).get("only"); if (fl) { P[fl] = true; P.forceSetup = true; }
+          out.style.font = "bold 22px/1.5 Menlo, monospace";
+          const recent = (arr, now) => (arr || []).filter((x) => x >= now - 10000);
+          const gaps = (t) => t.slice(1).map((x, i) => x - t[i]);
+          const stat = (d) => { const s = d.slice().sort((a, b) => a - b); const q = (p) => s.length ? s[Math.floor(p * (s.length - 1))] : 0;
+            return { med: q(0.5), p95: q(0.95), max: s.length ? s[s.length - 1] : 0 }; };
+          setInterval(() => {
+            const now = performance.now();
+            const raf = recent(P.rafTimes, now), drw = recent(P.times, now);
+            const rg = stat(gaps(raf)), dg = gaps(drw), ds = stat(dg);
+            const n = drw.length, dur = (P.drawDur || []).slice(-n), du = stat(dur);
+            const r = (x) => x.toFixed(1);
+            out.textContent =
+              (navigator.userAgent.match(/Version\/[\d.]+/)?.[0] || navigator.userAgent.match(/Chrome\/[\d.]+/)?.[0] || "") + "   screen x" + devicePixelRatio + "\n" +
+              "browser ticks/sec  " + r(raf.length / 10) + "   gap ms: typical " + r(rg.med) + ", worst " + r(rg.max) + "\n" +
+              "frames drawn/sec   " + r(n / 10) + "   gap ms: typical " + r(ds.med) + ", 95% " + r(ds.p95) + ", worst " + r(ds.max) + "\n" +
+              "pauses over 50 ms  " + dg.filter((x) => x > 50).length + "\n" +
+              "drawing ms/frame   typical " + r(du.med) + ", 95% " + r(du.p95) + ", worst " + r(du.max) + "\n" +
+              "(last 10 seconds; leave this tab in front)";
+          }, 1000);
+          return;
+        }
         // ?only=jsGlow (or any flag) holds one setting without the timing run, for comparing looks
         const only = new URLSearchParams(location.search).get("only");
         if (only !== null) { if (only) P[only] = true; P.forceSetup = true; out.remove(); return; }

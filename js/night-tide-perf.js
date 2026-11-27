@@ -543,6 +543,7 @@
   function draw(t) {
     if (PERF.forceSetup) setup();
     PERF.last = performance.now();
+    PERF.drawStart = PERF.last;
     light = lightAt(clockHour());
     frame(t);
     mark("scene");
@@ -641,6 +642,8 @@
     ctx.restore();
     mark("glowDraw");
     if (PERF.flush) { ctx.getImageData(0, 0, 1, 1); mark("gpuFlush"); }
+    (PERF.times || (PERF.times = [])).push(performance.now());
+    (PERF.drawDur || (PERF.drawDur = [])).push(performance.now() - PERF.drawStart);
     PERF.draws++; PERF.size = [canvas.width, canvas.height, cols, rows, scale];
   }
 
@@ -743,6 +746,7 @@
     raf = 0;
     if (!visible || document.hidden) return;
     raf = requestAnimationFrame(tick);
+    (PERF.rafTimes || (PERF.rafTimes = [])).push(now);
     if (!last) { last = now; return; }
     const dt = (now - last) / 1000;
     if (dt < 1 / 30 - 0.004) return; // 30 fps, like the original
