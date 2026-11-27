@@ -12,11 +12,21 @@
  * follows the visitor's local time (see "time of day"): at night the picture
  * is the original; dawn, day and dusk are new for the site.
  */
-(() => {
+(function nightTide() {
   "use strict";
 
   const canvas = document.getElementById("night-tide");
   if (!canvas || !canvas.getContext) return;
+
+  // The light comes from js/time-of-day.js. A page cached from before that
+  // file existed won't have loaded it, so fetch it first.
+  if (!window.timeOfDay) {
+    const s = document.createElement("script");
+    s.src = "/js/time-of-day.js";
+    s.onload = () => window.timeOfDay && nightTide();
+    document.head.appendChild(s);
+    return;
+  }
   const frameEl = canvas.parentElement;
   const ctx = canvas.getContext("2d");
 
@@ -42,9 +52,7 @@
   // visitor's local clock. The palettes and times live in js/time-of-day.js,
   // which every page loads first (the other pages use its sky as their
   // background). Night is the original exactly.
-  const tod = window.timeOfDay;
-  if (!tod) return;
-  const { lightAt, clockHour, lerp, mix3, rgb } = tod;
+  const { lightAt, clockHour, lerp, mix3, rgb } = window.timeOfDay;
 
   let light = lightAt(clockHour());
 
