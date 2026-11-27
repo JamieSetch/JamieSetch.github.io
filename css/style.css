@@ -279,8 +279,8 @@ body.home {
 }
 
 /*
- * Clicking About, Projects or the camera on the homepage flies into the
- * artwork towards what was clicked (js/zoom-nav.js sets --fly-x/--fly-y):
+ * Clicking About or Projects on the homepage flies into the
+ * artwork towards the word clicked (js/zoom-nav.js sets --fly-x/--fly-y):
  * the word grows and fades as it comes past, the letters fade, and only the
  * sky and its stars are left, the background of the page it opens. The
  * artwork fades out before it grows large, so bright water never fills the
@@ -298,15 +298,6 @@ body.zooming nav a {
 
 body.zooming nav a.fly-target {
   opacity: 1;
-  animation: word-in 1s cubic-bezier(0.5, 0, 0.85, 0.4) forwards;
-}
-
-body.zooming .camera-link {
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-body.zooming .camera-link.fly-target {
   animation: word-in 1s cubic-bezier(0.5, 0, 0.85, 0.4) forwards;
 }
 
@@ -335,109 +326,6 @@ body.zooming .camera-link.fly-target {
   100% {
     transform: scale(6);
     opacity: 0;
-  }
-}
-
-/*
- * The camera half-buried in the homepage sand: a thin line drawing that glows
- * like the artwork, tilted, its base hidden below a ridge of sand. An
- * unlabelled link to Travels (an easter egg); the lens catches the light now
- * and then.
- */
-.camera-link {
-  position: fixed;
-  z-index: 1;
-  left: 64%;
-  bottom: 1.5vh;
-  bottom: 1.5dvh;
-  display: block;
-  width: clamp(64px, 8vw, 118px);
-  color: #fff;
-  opacity: 0.82;
-  filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.45)) drop-shadow(0 1px 1px rgba(0, 0, 0, 0.3));
-  transition: opacity 0.3s ease, filter 0.3s ease;
-}
-
-.camera-link:hover,
-.camera-link:focus-visible {
-  opacity: 1;
-  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.7)) drop-shadow(0 1px 1px rgba(0, 0, 0, 0.3));
-}
-
-.camera-link svg {
-  display: block;
-  width: 100%;
-  height: auto;
-  overflow: visible;
-}
-
-.camera-link .cam *,
-.camera-link .sand {
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  vector-effect: non-scaling-stroke;
-}
-
-.camera-link .sand {
-  stroke: url(#camera-sand-ridge);
-}
-
-/* a little colour: dark leatherette, a silver top plate, blue-violet glass, a red badge */
-.camera-link .cam .leather {
-  fill: #20242c;
-  fill-opacity: 0.78;
-}
-
-.camera-link .cam .silver {
-  fill: #c9ced8;
-  fill-opacity: 0.38;
-}
-
-.camera-link .cam .barrel {
-  fill: #2b303b;
-  fill-opacity: 0.85;
-}
-
-.camera-link .cam .glass {
-  fill: url(#camera-glass);
-}
-
-.camera-link .cam .window {
-  fill: #a9d2f0;
-  fill-opacity: 0.4;
-}
-
-.camera-link .cam .badge {
-  fill: #d8392f;
-  stroke: none;
-}
-
-.camera-link .grains {
-  fill: currentColor;
-  opacity: 0.55;
-}
-
-.camera-link .glint {
-  stroke-width: 1.6;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .camera-link .glint {
-    animation: glint 7s ease-in-out infinite;
-  }
-}
-
-@keyframes glint {
-  0%,
-  70%,
-  100% {
-    opacity: 0.35;
-  }
-  80% {
-    opacity: 1;
   }
 }
 

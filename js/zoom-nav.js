@@ -1,9 +1,9 @@
 /*
- * Homepage links: clicking About, Projects or the camera in the sand flies
- * into the artwork towards what was clicked (the word grows and fades as it
- * comes past), until only the sky and its stars are left, the background of
- * the other pages. Then the page opens and its text fades in. The animation
- * itself is the "fly-in" keyframes in css/style.css.
+ * Homepage links: clicking About or Projects flies into the artwork towards
+ * the word clicked (it grows and fades as it comes past), until only the sky
+ * and its stars are left, the background of the other pages. Then the page
+ * opens and its text fades in. The animation itself is the "fly-in"
+ * keyframes in css/style.css.
  *
  * Skipped for people who prefer less motion, and for clicks that open a new
  * tab or window.
@@ -17,7 +17,7 @@
   const hour = new URLSearchParams(window.location.search).get("hour");
   const root = document.documentElement;
 
-  for (const link of document.querySelectorAll(".home nav a, .camera-link")) {
+  for (const link of document.querySelectorAll(".home nav a")) {
     const to = new URL(link.href, window.location.href);
     if (to.pathname === window.location.pathname) continue; // Home itself
     if (hour !== null) {

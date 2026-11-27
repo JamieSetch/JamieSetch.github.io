@@ -7,10 +7,9 @@ A plain static site: no build step, no dependencies. Live at https://jamiesetch.
 - `index.html` — home page: the animated artwork *NIGHT TIDE* fills the window, with the nav in white in its night sky
 - `js/night-tide.js` — JavaScript port of JIN2's `night_tide.py` that draws the homepage animation
 - `js/time-of-day.js` — the time-of-day colours and the twinkling stars, shared by every page (loaded in each page's `<head>`)
-- `js/zoom-nav.js` — on the homepage, clicking About, Projects or the camera flies through the artwork into the sky first
+- `js/zoom-nav.js` — on the homepage, clicking About or Projects flies through the artwork into the sky first
 - `about/`, `projects/` — one `index.html` per section, so URLs are `/about/` etc. (research lives on the About page)
-- `travels/` — reached only from the camera half-buried in the homepage sand (an unlabelled easter egg, not in the nav;
-  the camera is a thin-line SVG in `index.html`, styled in `css/style.css`)
+- `travels/` — not linked from anywhere yet (it was reached from a camera in the homepage sand, since removed)
 - `css/style.css` — the only stylesheet
 - `archive/` — previous versions of the site, kept for reference
   - `2024-music-site/` — the original music-and-merch site (build.py + templates)
@@ -53,8 +52,7 @@ from its top down to just above the horizon (stopping there keeps the white text
 Stars twinkle over every page's sky whenever the homepage sky has them (night, dawn, dusk), in the same
 places on every page. Clicking About or Projects on the homepage zooms into the artwork towards the
 word clicked (it grows and fades as it comes past), the letters fading before they get large, until only
-that sky and its stars are left; then the page's text fades in. The camera in the sand does the same,
-flying into the sand, and opens Travels. People who prefer reduced motion go straight there.
+that sky and its stars are left; then the page's text fades in. People who prefer reduced motion go straight there.
 
 ## Publish
 
