@@ -9,7 +9,6 @@ A plain static site: no build step, no dependencies. Live at https://jamiesetch.
 - `js/time-of-day.js` — the time-of-day colours, shared by every page (loaded in each page's `<head>`)
 - `about/`, `projects/` — one `index.html` per section, so URLs are `/about/` etc. (research lives on the About page)
 - `css/style.css` — the only stylesheet
-- `favicon.png` — the bird logo
 - `archive/` — previous versions of the site, kept for reference
   - `2024-music-site/` — the original music-and-merch site (build.py + templates)
   - `2026-03-rebuild/` — the unfinished March 2026 shop-style rebuild
