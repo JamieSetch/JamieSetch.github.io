@@ -1,56 +1,44 @@
 <!doctype html>
-<html lang="en">
+<html lang="en-GB">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Jamie Setch</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Index | Jamie Setch</title>
     <meta
       name="description"
-      content="Official website of Jamie Setch. New frontend rebuild in progress."
+      content="Jamie Setch — NeuroAI researcher at the University of Cambridge. Spiking neural networks, brain–computer interfaces and brain-inspired robot control."
     />
-    <link rel="stylesheet" href="./styles/main.css" />
+    <meta name="theme-color" content="#000000" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&display=swap"
+    />
+    <link rel="stylesheet" href="/css/style.css" />
   </head>
-  <body class="splash-active">
-    <div id="splash-screen" class="splash-screen" aria-hidden="true">
-      <p class="splash-title">
-        <span class="splash-word splash-word-jamie">Jamie</span>
-        <span class="splash-word splash-word-setch">Setch</span>
-      </p>
+  <body class="home">
+    <div class="tide-frame">
+      <canvas
+        id="night-tide"
+        role="img"
+        aria-label="Animated ASCII art: waves rolling in and breaking on a beach at night, with moonlight glittering on the water"
+      ></canvas>
     </div>
-
-    <div class="promo-bar">SAVE AN EXTRA 30% OFF SALE</div>
-
-    <header class="main-header">
-      <div class="logo-group">
-        <a class="logo-wordmark" href="/" aria-label="Jamie Setch home">Jam<span class="logo-i-letter">i<img
-              class="logo-i-dot"
-              src="./assets/JamieSetchLogo.png"
-              alt=""
-              aria-hidden="true"
-          /></span>e Setch</a>
-        <p class="logo-sub">CAMBRIDGE</p>
-      </div>
-
-      <nav class="main-nav" aria-label="Main navigation">
-        <a href="/">HIS</a>
-        <a href="/">HERS</a>
-        <a href="/">THEIRS</a>
-        <a href="/">ABOUT</a>
+    <header role="banner">
+      <nav role="navigation" aria-label="Main">
+        <ul>
+          <li><a href="/" class="active" aria-current="page">Index</a></li>
+          <li><a href="/about/">About</a></li>
+          <li><a href="/research/">Research</a></li>
+          <li><a href="/projects/">Projects</a></li>
+        </ul>
       </nav>
-
-      <div class="icon-actions" aria-label="Header actions">
-        <button type="button" class="icon-btn" aria-label="Search">
-          <span class="icon-sprite icon-search" aria-hidden="true"></span>
-        </button>
-        <button type="button" class="icon-btn" aria-label="Account">
-          <span class="icon-sprite icon-account" aria-hidden="true"></span>
-        </button>
-        <button type="button" class="icon-btn" aria-label="Bag">
-          <span class="icon-sprite icon-bag" aria-hidden="true"></span>
-        </button>
-      </div>
     </header>
-
-    <script src="./js/main.js"></script>
+    <main id="main" role="main">
+      <h1 class="visually-hidden">Jamie Setch</h1>
+    </main>
+    <script src="/js/night-tide.js" defer></script>
   </body>
 </html>
