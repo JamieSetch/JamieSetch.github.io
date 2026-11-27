@@ -6,7 +6,7 @@ A plain static site: no build step, no dependencies.
 
 - `index.html` — home page: the animated artwork *NIGHT TIDE* fills the window, with the nav in white in its night sky
 - `js/night-tide.js` — JavaScript port of JIN2's `night_tide.py` that draws the homepage animation
-- `about/`, `research/`, `projects/` — one `index.html` per section, so URLs are `/about/` etc.
+- `about/`, `projects/` — one `index.html` per section, so URLs are `/about/` etc. (research lives on the About page)
 - `css/style.css` — the only stylesheet
 - `favicon.png` — the bird logo
 - `archive/` — previous versions of the site, kept for reference
@@ -45,6 +45,12 @@ waves have just been (catching the sea's light, gold at dusk, with a few glints)
 To preview a time, add `?hour=` to the address, e.g. http://localhost:8090/?hour=13 or `?hour=19`.
 The colours and times live in the "time of day" block near the top of `js/night-tide.js`.
 
+## After changing CSS or JS
+
+Browsers keep old copies of `css/style.css` and `js/night-tide.js`. Each page links them with a
+`?v=...` version tag; change that tag in every page (`index.html`, `about/`, `projects/`) whenever you
+edit either file, so visitors get the new version straight away.
+
 ## Adding a page
 
-Copy an existing section folder, change the `<title>`, and move `class="active" aria-current="page"` to the matching nav link. The nav is repeated in each page, so a new heading has to be added to all four files.
+Copy an existing section folder, change the `<title>`, and move `class="active" aria-current="page"` to the matching nav link. The nav is repeated in each page, so a new heading has to be added to every page (`index.html`, `about/`, `projects/`).

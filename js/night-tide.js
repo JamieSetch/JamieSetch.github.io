@@ -58,21 +58,21 @@
       [240, 200, 200], [255, 226, 200], [246, 226, 232], [130, 96, 104], [200, 180, 210]],
     top: [16, 16, 44], horizon: [92, 56, 96], sea: [10, 10, 26], wetSand: [72, 56, 64], sand: [132, 108, 108],
     shallow: [112, 92, 140], shallowMix: 0.7, // clear lavender water over sand
-    gain: 1.05, glitter: 0.6, stars: 0.3, sheen: 0.3, sandGlint: 0.45,
+    gain: 1.05, glitter: 0.6, stars: 0.3, sheen: 0.3, sandGlint: 0.03,
   };
   const DAY = {
     colors: [[10, 60, 96], [14, 86, 126], [20, 116, 156], [36, 150, 184], [84, 188, 210], [150, 222, 232],
       [214, 240, 246], [255, 252, 230], [246, 250, 252], [196, 170, 126], [200, 220, 240]],
     top: [12, 52, 100], horizon: [70, 130, 180], sea: [6, 34, 60], wetSand: [124, 106, 80], sand: [196, 176, 136],
     shallow: [64, 178, 188], shallowMix: 0.85, // clear turquoise water over sand
-    gain: 1.15, glitter: 0.52, stars: 0, sheen: 0.1, sandGlint: 0.4,
+    gain: 1.15, glitter: 0.52, stars: 0, sheen: 0.1, sandGlint: 0.015,
   };
   const DUSK = {
     colors: [[40, 22, 60], [70, 32, 82], [110, 44, 98], [160, 64, 100], [214, 102, 88], [244, 156, 96],
       [250, 196, 150], [255, 222, 150], [252, 222, 204], [176, 116, 78], [210, 180, 200]],
     top: [22, 12, 44], horizon: [120, 52, 58], sea: [14, 8, 24], wetSand: [82, 52, 46], sand: [152, 106, 80],
     shallow: [150, 84, 72], shallowMix: 0.6, // clear water over sand, catching the sunset
-    gain: 1.05, glitter: 0.58, stars: 0.4, sheen: 0.45, sandGlint: 0.6,
+    gain: 1.05, glitter: 0.58, stars: 0.4, sheen: 0.45, sandGlint: 0.05,
   };
   // (hour, light): blends smoothly between neighbours
   const DAY_KEYS = [[0, NIGHT], [4.5, NIGHT], [6, DAWN], [8, DAY], [17, DAY], [19, DUSK], [20.5, NIGHT], [24, NIGHT]];
@@ -546,9 +546,11 @@
           }
           // glints only while a wave is running over the sand, i.e. there is water on it
           // (added for dawn, day and dusk; sandGlint is 0 at night)
-          if (light.sandGlint > 0 && film > 0.5) {
+          // light.sandGlint is the share of that wet sand glinting at any moment
+          if (light.sandGlint > 0.001 && film > 0.5) {
+            const edge = Math.cos(Math.PI * light.sandGlint); // sin(...) > edge for that share of the time
             const tw = Math.sin(rv * 431 + t * (3 + 7 * rv));
-            const spec = smooth((tw - 0.86) / 0.1) * light.sandGlint;
+            const spec = tw > edge ? smooth((tw - edge) / (1 - edge)) : 0;
             if (spec > 0.3) {
               ch = spec > 0.6 && rv < 0.5 ? C_STAR : C_DOT;
               lum = 0.45 + 0.5 * spec;
