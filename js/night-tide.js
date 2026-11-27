@@ -50,24 +50,28 @@
   const NIGHT = {
     colors: TAG_COLOR,
     top: [0, 0, 0], horizon: [0, 0, 0], sea: [0, 0, 0], wetSand: [0, 0, 0], sand: [0, 0, 0],
+    shallow: [0, 0, 0], shallowMix: 0,
     gain: 1, glitter: 0.68, stars: 1, sheen: 0, sandGlint: 0,
   };
   const DAWN = {
     colors: [[44, 30, 70], [66, 44, 98], [96, 62, 124], [136, 86, 146], [184, 118, 160], [226, 160, 176],
       [240, 200, 200], [255, 226, 200], [246, 226, 232], [130, 96, 104], [200, 180, 210]],
     top: [16, 16, 44], horizon: [92, 56, 96], sea: [10, 10, 26], wetSand: [44, 34, 44], sand: [86, 68, 74],
+    shallow: [0, 0, 0], shallowMix: 0,
     gain: 1.05, glitter: 0.6, stars: 0.3, sheen: 0.45, sandGlint: 0.7,
   };
   const DAY = {
     colors: [[10, 60, 96], [14, 86, 126], [20, 116, 156], [36, 150, 184], [84, 188, 210], [150, 222, 232],
       [214, 240, 246], [255, 252, 230], [246, 250, 252], [196, 170, 126], [200, 220, 240]],
-    top: [12, 52, 100], horizon: [70, 130, 180], sea: [6, 34, 60], wetSand: [92, 80, 62], sand: [168, 146, 108],
-    gain: 1.15, glitter: 0.52, stars: 0, sheen: 0.35, sandGlint: 0.6,
+    top: [12, 52, 100], horizon: [70, 130, 180], sea: [6, 34, 60], wetSand: [124, 106, 80], sand: [196, 176, 136],
+    shallow: [64, 178, 188], shallowMix: 0.85, // clear turquoise water over sand
+    gain: 1.15, glitter: 0.52, stars: 0, sheen: 0.1, sandGlint: 0.4,
   };
   const DUSK = {
     colors: [[40, 22, 60], [70, 32, 82], [110, 44, 98], [160, 64, 100], [214, 102, 88], [244, 156, 96],
       [250, 196, 150], [255, 222, 150], [252, 222, 204], [176, 116, 78], [210, 180, 200]],
     top: [22, 12, 44], horizon: [120, 52, 58], sea: [14, 8, 24], wetSand: [52, 32, 36], sand: [104, 66, 56],
+    shallow: [0, 0, 0], shallowMix: 0,
     gain: 1.05, glitter: 0.58, stars: 0.4, sheen: 0.6, sandGlint: 1,
   };
   // (hour, light): blends smoothly between neighbours
@@ -88,6 +92,7 @@
       colors: a.colors.map((c, i) => mix3(c, b.colors[i], u)),
       top: mix3(a.top, b.top, u), horizon: mix3(a.horizon, b.horizon, u), sea: mix3(a.sea, b.sea, u),
       wetSand: mix3(a.wetSand, b.wetSand, u), sand: mix3(a.sand, b.sand, u),
+      shallow: mix3(a.shallow, b.shallow, u), shallowMix: lerp(a.shallowMix, b.shallowMix, u),
       gain: lerp(a.gain, b.gain, u), glitter: lerp(a.glitter, b.glitter, u), stars: lerp(a.stars, b.stars, u),
       sheen: lerp(a.sheen, b.sheen, u), sandGlint: lerp(a.sandGlint, b.sandGlint, u),
     };
@@ -186,7 +191,7 @@
   let img, px32;
   let art, actx; // the letters alone, on black
   // sand showing through, per cell (daytime lighting only): how much, and how dry
-  let groundA, groundD, groundS, ground, gctx, groundImg; // S: how wet and shiny
+  let groundA, groundD, groundS, groundW, ground, gctx, groundImg; // S: how wet and shiny, W: under water
   let glow4, glow8, g4ctx, g8ctx;
   const canFilter = "filter" in ctx;
 
@@ -227,7 +232,7 @@
     for (let i = 0; i < hsh.length; i++) hsh[i] = Math.floor(rand() * 12);
     charA = new Uint8Array(cols * rows); lumA = new Float64Array(cols * rows); tagA = new Uint8Array(cols * rows);
     groundA = new Float32Array(cols * rows); groundD = new Float32Array(cols * rows);
-    groundS = new Float32Array(cols * rows);
+    groundS = new Float32Array(cols * rows); groundW = new Uint8Array(cols * rows);
 
     // canvas at whole-cell size, sharp on retina screens
     canvas.width = cols * CW * scale;
@@ -577,7 +582,7 @@
             gS = 1;
           }
         }
-        groundA[i] = gA; groundD[i] = gD; groundS[i] = gS;
+        groundA[i] = gA; groundD[i] = gD; groundS[i] = gS; groundW[i] = beach ? 0 : 1;
       }
     }
   }
@@ -637,6 +642,7 @@
     // then the sand, blended in cell by cell (skipped at night, when it would be black)
     const sw = light.wetSand, sd = light.sand;
     const shine = light.colors[5], sheen = light.sheen; // the sea's brightest tone
+    const sh = light.shallow, shMix = light.shallowMix;
     if (sd[0] + sd[1] + sd[2] > 1) {
       const gd = groundImg.data;
       for (let i = 0, p = 0; i < groundA.length; i++, p += 4) {
@@ -644,9 +650,10 @@
         if (a <= 0) { gd[p + 3] = 0; continue; }
         const u = groundD[i];
         const k = sheen * groundS[i];
-        gd[p] = lerp(sw[0] + (sd[0] - sw[0]) * u, shine[0], k);
-        gd[p + 1] = lerp(sw[1] + (sd[1] - sw[1]) * u, shine[1], k);
-        gd[p + 2] = lerp(sw[2] + (sd[2] - sw[2]) * u, shine[2], k);
+        const w = groundW[i] ? shMix : 0;
+        gd[p] = lerp(lerp(sw[0] + (sd[0] - sw[0]) * u, shine[0], k), sh[0], w);
+        gd[p + 1] = lerp(lerp(sw[1] + (sd[1] - sw[1]) * u, shine[1], k), sh[1], w);
+        gd[p + 2] = lerp(lerp(sw[2] + (sd[2] - sw[2]) * u, shine[2], k), sh[2], w);
         gd[p + 3] = a * 255;
       }
       gctx.putImageData(groundImg, 0, 0);
