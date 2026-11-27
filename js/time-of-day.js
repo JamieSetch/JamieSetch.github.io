@@ -97,5 +97,91 @@
   paintSky();
   setInterval(paintSky, 60 * 1000);
 
+  // Arriving from the homepage's fly-in (js/zoom-nav.js): the sky and stars
+  // are already there, and the page's text fades in over them.
+  try {
+    if (sessionStorage.getItem("arriving") === "1") {
+      sessionStorage.removeItem("arriving");
+      root.classList.add("arriving");
+    }
+  } catch {}
+
+  // Stars: NIGHT TIDE's scattered ASCII stars, spread over the whole
+  // background of every page and twinkling the same way. They fade out by
+  // day. On the homepage they sit hidden behind the artwork until a link
+  // flies through it into the sky (js/zoom-nav.js).
+  const STAR_CHANCE = 0.003, BIG_STAR = 0.0008; // per cell, as in the homepage sky
+  const still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // a fixed random number per cell, so the stars sit in the same places on every page
+  function cellRand(c, r) {
+    let h = Math.imul(c + 1, 374761393) ^ Math.imul(r + 1, 668265263) ^ 0x5bd1e995;
+    h = Math.imul(h ^ (h >>> 13), 1274126177);
+    return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
+  }
+
+  function startStars() {
+    const cvs = document.createElement("canvas");
+    cvs.className = "sky-stars";
+    cvs.setAttribute("aria-hidden", "true");
+    document.body.prepend(cvs);
+    const g = cvs.getContext("2d");
+    let stars = [], unit = 1, dpr = 1;
+
+    function layout() {
+      const w = window.innerWidth, h = window.innerHeight;
+      dpr = Math.min(2, window.devicePixelRatio || 1);
+      // same letter size as the homepage, which caps its grid at ~20,000 cells
+      unit = Math.max(1, Math.sqrt((w * h) / (6 * 9 * 20000)));
+      cvs.width = Math.round(w * dpr);
+      cvs.height = Math.round(h * dpr);
+      cvs.style.width = w + "px";
+      cvs.style.height = h + "px";
+      stars = [];
+      const cols = Math.floor(w / (6 * unit)), rows = Math.floor(h / (9 * unit));
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const rv = cellRand(c, r);
+          if (rv < STAR_CHANCE) stars.push({ x: (c + 0.5) * 6 * unit, y: (r + 0.5) * 9 * unit, rv, big: rv < BIG_STAR });
+        }
+      }
+      draw();
+    }
+
+    function draw() {
+      g.setTransform(1, 0, 0, 1, 0, 0);
+      g.clearRect(0, 0, cvs.width, cvs.height);
+      const light = lightAt(clockHour());
+      if (light.stars < 0.01) return;
+      const col = light.colors[10]; // star colour
+      const t = performance.now() / 1000;
+      g.setTransform(dpr, 0, 0, dpr, 0, 0);
+      g.font = `${10 * unit}px Consolas, Menlo, "DejaVu Sans Mono", "Courier New", monospace`;
+      g.textAlign = "center";
+      g.textBaseline = "middle";
+      g.shadowBlur = 5 * unit * dpr;
+      for (const s of stars) {
+        const lum = (0.4 + 0.3 * Math.sin(0.9 * t + s.rv * 7000)) * light.stars;
+        g.fillStyle = g.shadowColor = rgb([col[0] * lum, col[1] * lum, col[2] * lum]);
+        g.fillText(s.big ? "+" : ".", s.x, s.y);
+      }
+    }
+
+    let last = 0;
+    function tick(now) {
+      requestAnimationFrame(tick);
+      if (document.hidden || now - last < 66) return; // ~15 fps is plenty for a slow twinkle
+      last = now;
+      draw();
+    }
+
+    layout();
+    window.addEventListener("resize", layout);
+    if (!still) requestAnimationFrame(tick);
+  }
+
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", startStars);
+  else startStars();
+
   window.timeOfDay = { lightAt, clockHour, lerp, mix3, rgb };
 })();

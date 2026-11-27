@@ -52,6 +52,30 @@ body::before {
   background: linear-gradient(var(--sky-top), var(--sky-low));
 }
 
+/* its stars (drawn by js/time-of-day.js), added onto the sky like light */
+.sky-stars {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  pointer-events: none;
+  mix-blend-mode: plus-lighter;
+}
+
+/* arriving from the homepage's fly-in: the sky is already there, the text fades in */
+html.arriving body > :not(.sky-stars) {
+  animation: arrive 0.9s ease-out both;
+}
+
+@keyframes arrive {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 strong,
 b {
   font-weight: 700;
@@ -199,7 +223,6 @@ body.home {
   margin: 0;
   padding: 0;
   overflow: hidden;
-  background: #000;
   color: #fff;
 }
 
@@ -253,6 +276,95 @@ body.home {
 .home nav a:focus-visible {
   color: #fff;
   text-decoration: underline;
+}
+
+/*
+ * Clicking About, Projects or the camera on the homepage flies into the
+ * artwork towards what was clicked (js/zoom-nav.js sets --fly-x/--fly-y):
+ * the word grows and fades as it comes past, the letters fade, and only the
+ * sky and its stars are left, the background of the page it opens. The
+ * artwork fades out before it grows large, so bright water never fills the
+ * screen.
+ */
+body.zooming .tide-frame {
+  transform-origin: var(--fly-x, 50%) var(--fly-y, 11%);
+  animation: fly-in 1.2s cubic-bezier(0.5, 0, 0.85, 0.4) forwards;
+}
+
+body.zooming nav a {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+body.zooming nav a.fly-target {
+  opacity: 1;
+  animation: word-in 1s cubic-bezier(0.5, 0, 0.85, 0.4) forwards;
+}
+
+body.zooming .camera-link {
+  visibility: hidden;
+}
+
+@keyframes fly-in {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  30% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 0;
+  }
+  100% {
+    transform: scale(5);
+    opacity: 0;
+  }
+}
+
+@keyframes word-in {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(6);
+    opacity: 0;
+  }
+}
+
+/* the camera half-buried in the sand (drawn by js/camera.js): a link to Travels */
+.camera-link {
+  position: fixed;
+  z-index: 1;
+  display: block;
+}
+
+.camera-link[hidden] {
+  display: none;
+}
+
+.camera-label {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  margin-bottom: 0.4rem;
+  padding-left: 0.24em;
+  transform: translateX(-50%);
+  font-size: 1rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: #fff;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+
+.camera-link:hover .camera-label,
+.camera-link:focus-visible .camera-label {
+  opacity: 1;
 }
 
 /* Read by screen readers and search engines, not shown */
