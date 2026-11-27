@@ -1,14 +1,17 @@
 /*
  * Jamie Setch — research portfolio
- * Minimal black-and-white layout set in Cormorant Garamond: centred nav in
- * spaced capitals, fine rules, and NIGHT TIDE filling the homepage.
+ * Minimal layout set in Cormorant Garamond: white text on the sky, centred nav
+ * in spaced capitals, fine rules, and NIGHT TIDE filling the homepage.
+ *
+ * The sky follows the visitor's local time: js/time-of-day.js sets --sky-top
+ * and --sky-low (black, the night sky, until it runs or if it can't).
  */
 
 :root {
-  --fg: #000;
-  --bg: #fff;
-  --muted: rgba(0, 0, 0, 0.6);
-  --hover: dodgerblue;
+  --fg: #fff;
+  --muted: rgba(255, 255, 255, 0.75);
+  --sky-top: #000;
+  --sky-low: #000;
   /* an elegant serif; falls back to classic Mac/Windows serifs if it can't load */
   --font: "Cormorant Garamond", Didot, "Bodoni 72", "Hoefler Text", Garamond, "Palatino Linotype", Palatino,
     Georgia, serif;
@@ -16,6 +19,7 @@
 
 html {
   box-sizing: border-box;
+  background: var(--sky-top); /* also fills the overscroll area */
 }
 
 *,
@@ -28,7 +32,6 @@ body {
   margin: 0 auto;
   max-width: 50rem;
   padding: 1rem;
-  background: var(--bg);
   color: var(--fg);
   font-family: var(--font);
   font-size: 1.2rem; /* this face runs small, so body text is set a size up */
@@ -38,6 +41,15 @@ body {
   text-rendering: optimizeLegibility;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
+}
+
+/* the sky, fixed behind the page */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(var(--sky-top), var(--sky-low));
 }
 
 strong,
@@ -57,11 +69,12 @@ a:visited {
 
 a:hover,
 a:visited:hover {
-  color: var(--hover);
+  color: var(--fg);
+  text-decoration-thickness: 2px;
 }
 
 a:focus-visible {
-  outline: 2px solid var(--hover);
+  outline: 2px solid var(--fg);
   outline-offset: 2px;
 }
 

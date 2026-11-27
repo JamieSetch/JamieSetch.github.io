@@ -6,6 +6,7 @@ A plain static site: no build step, no dependencies. Live at https://jamiesetch.
 
 - `index.html` — home page: the animated artwork *NIGHT TIDE* fills the window, with the nav in white in its night sky
 - `js/night-tide.js` — JavaScript port of JIN2's `night_tide.py` that draws the homepage animation
+- `js/time-of-day.js` — the time-of-day colours, shared by every page (loaded in each page's `<head>`)
 - `about/`, `projects/` — one `index.html` per section, so URLs are `/about/` etc. (research lives on the About page)
 - `css/style.css` — the only stylesheet
 - `favicon.png` — the bird logo
@@ -43,7 +44,9 @@ sand shows through the shallows in patches and covers the beach (bottom ~14%), w
 waves have just been (catching the sea's light, gold at dusk, with a few glints) and drier further up; at night it stays black like the original.
 
 To preview a time, add `?hour=` to the address, e.g. http://localhost:8090/?hour=13 or `?hour=19`.
-The colours and times live in the "time of day" block near the top of `js/night-tide.js`.
+The colours and times live in `js/time-of-day.js`. The other pages use the same sky as their background,
+from its top down to just above the horizon (stopping there keeps the white text readable at midday), so
+`?hour=` works on them too. Without JavaScript they show the night sky: black.
 
 ## Publish
 
@@ -59,7 +62,7 @@ The live site updates a minute or two later. `.nojekyll` tells GitHub to serve t
 
 ## After changing CSS or JS
 
-Browsers keep old copies of `css/style.css` and `js/night-tide.js`. Each page links them with a
+Browsers keep old copies of `css/style.css` and the files in `js/`. Each page links them with a
 `?v=...` version tag; change that tag in every page (`index.html`, `about/`, `projects/`) whenever you
 edit either file, so visitors get the new version straight away.
 

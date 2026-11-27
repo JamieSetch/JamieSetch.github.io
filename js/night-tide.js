@@ -34,80 +34,17 @@
   const LOOP = 20.0;
   const CW = 6, CH = 9, FONT_PX = 10; // cell width, cell height, font px
 
-  const TAG_COLOR = [[20, 34, 64], [28, 50, 92], [40, 72, 122], [62, 100, 152], [98, 136, 182], [146, 176, 210],
-    [196, 206, 218], [236, 238, 240], [222, 230, 240], [86, 84, 98], [170, 180, 205]];
   const SILVER = 6, GLINT = 7, FOAM = 8, SAND = 9, STAR = 10;
 
   // ------------------------------------------------------------ time of day
   //
   // Added for this site, not in the original piece: the light follows the
-  // visitor's local clock. Night is the original exactly; dawn, day and dusk
-  // only change the palette, the sky behind the letters, how much glitter
-  // catches the light, and whether the stars show. The waves never change.
-  // Preview any time with ?hour=13.5 in the address.
-
-  // colours: six water tones dark to bright, then silver, glint, foam, sand, star
-  const NIGHT = {
-    colors: TAG_COLOR,
-    top: [0, 0, 0], horizon: [0, 0, 0], sea: [0, 0, 0], wetSand: [0, 0, 0], sand: [0, 0, 0],
-    shallow: [0, 0, 0], shallowMix: 0,
-    gain: 1, glitter: 0.68, stars: 1, sheen: 0, sandGlint: 0,
-  };
-  const DAWN = {
-    colors: [[44, 30, 70], [66, 44, 98], [96, 62, 124], [136, 86, 146], [184, 118, 160], [226, 160, 176],
-      [240, 200, 200], [255, 226, 200], [246, 226, 232], [130, 96, 104], [200, 180, 210]],
-    top: [16, 16, 44], horizon: [92, 56, 96], sea: [10, 10, 26], wetSand: [72, 56, 64], sand: [132, 108, 108],
-    shallow: [112, 92, 140], shallowMix: 0.7, // clear lavender water over sand
-    gain: 1.05, glitter: 0.6, stars: 0.3, sheen: 0.3, sandGlint: 0.03,
-  };
-  const DAY = {
-    colors: [[10, 60, 96], [14, 86, 126], [20, 116, 156], [36, 150, 184], [84, 188, 210], [150, 222, 232],
-      [214, 240, 246], [255, 252, 230], [246, 250, 252], [196, 170, 126], [200, 220, 240]],
-    top: [12, 52, 100], horizon: [70, 130, 180], sea: [6, 34, 60], wetSand: [124, 106, 80], sand: [196, 176, 136],
-    shallow: [64, 178, 188], shallowMix: 0.85, // clear turquoise water over sand
-    gain: 1.15, glitter: 0.52, stars: 0, sheen: 0.1, sandGlint: 0.015,
-  };
-  const DUSK = {
-    colors: [[40, 22, 60], [70, 32, 82], [110, 44, 98], [160, 64, 100], [214, 102, 88], [244, 156, 96],
-      [250, 196, 150], [255, 222, 150], [252, 222, 204], [176, 116, 78], [210, 180, 200]],
-    top: [22, 12, 44], horizon: [120, 52, 58], sea: [14, 8, 24], wetSand: [82, 52, 46], sand: [152, 106, 80],
-    shallow: [150, 84, 72], shallowMix: 0.6, // clear water over sand, catching the sunset
-    gain: 1.05, glitter: 0.58, stars: 0.4, sheen: 0.45, sandGlint: 0.05,
-  };
-  // (hour, light): blends smoothly between neighbours
-  const DAY_KEYS = [[0, NIGHT], [4.5, NIGHT], [6, DAWN], [8, DAY], [17, DAY], [19, DUSK], [20.5, NIGHT], [24, NIGHT]];
-
-  const lerp = (a, b, u) => a + (b - a) * u;
-  const mix3 = (a, b, u) => [lerp(a[0], b[0], u), lerp(a[1], b[1], u), lerp(a[2], b[2], u)];
-
-  function lightAt(hour) {
-    const h = ((hour % 24) + 24) % 24;
-    let k = 0;
-    while (k < DAY_KEYS.length - 2 && h > DAY_KEYS[k + 1][0]) k++;
-    const [h0, a] = DAY_KEYS[k], [h1, b] = DAY_KEYS[k + 1];
-    if (a === b) return a;
-    let u = (h - h0) / (h1 - h0);
-    u = u * u * (3 - 2 * u);
-    return {
-      colors: a.colors.map((c, i) => mix3(c, b.colors[i], u)),
-      top: mix3(a.top, b.top, u), horizon: mix3(a.horizon, b.horizon, u), sea: mix3(a.sea, b.sea, u),
-      wetSand: mix3(a.wetSand, b.wetSand, u), sand: mix3(a.sand, b.sand, u),
-      shallow: mix3(a.shallow, b.shallow, u), shallowMix: lerp(a.shallowMix, b.shallowMix, u),
-      gain: lerp(a.gain, b.gain, u), glitter: lerp(a.glitter, b.glitter, u), stars: lerp(a.stars, b.stars, u),
-      sheen: lerp(a.sheen, b.sheen, u), sandGlint: lerp(a.sandGlint, b.sandGlint, u),
-    };
-  }
-
-  const forcedHour = (() => {
-    const q = new URLSearchParams((window.location && window.location.search) || "").get("hour");
-    return q !== null && q.trim() !== "" && Number.isFinite(+q) ? +q : null;
-  })();
-
-  function clockHour() {
-    if (forcedHour !== null) return forcedHour;
-    const d = new Date();
-    return d.getHours() + d.getMinutes() / 60 + d.getSeconds() / 3600;
-  }
+  // visitor's local clock. The palettes and times live in js/time-of-day.js,
+  // which every page loads first (the other pages use its sky as their
+  // background). Night is the original exactly.
+  const tod = window.timeOfDay;
+  if (!tod) return;
+  const { lightAt, clockHour, lerp, mix3, rgb } = tod;
 
   let light = lightAt(clockHour());
 
@@ -679,14 +616,7 @@
     ctx.globalAlpha = 0.45;
     ctx.drawImage(glow8, 0, 0, canvas.width, canvas.height);
     ctx.restore();
-
-    // match the phone browser's bar to the sky
-    const top = rgb(light.top);
-    if (themeMeta && themeMeta.content !== top) themeMeta.content = top;
   }
-
-  const rgb = (c) => `rgb(${Math.round(c[0])}, ${Math.round(c[1])}, ${Math.round(c[2])})`;
-  const themeMeta = document.querySelector ? document.querySelector('meta[name="theme-color"]') : null;
 
   function shrinkBlur(gctx, gcan, sigma) {
     gctx.globalCompositeOperation = "copy";
