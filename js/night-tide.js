@@ -540,10 +540,6 @@
   function draw(t) {
     light = lightAt(clockHour());
     frame(t);
-    // site additions drawn into the same letter grid after the scene (the
-    // camera in js/camera.js); the scene itself is untouched
-    const extras = window.nightTideExtras;
-    if (extras) for (const add of extras) add({ t, cols, rows, char: charA, lum: lumA, tag: tagA, glyph: AT, light });
     const palette = light.colors;
 
     // fade the trail to half

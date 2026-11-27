@@ -8,9 +8,9 @@ A plain static site: no build step, no dependencies. Live at https://jamiesetch.
 - `js/night-tide.js` — JavaScript port of JIN2's `night_tide.py` that draws the homepage animation
 - `js/time-of-day.js` — the time-of-day colours and the twinkling stars, shared by every page (loaded in each page's `<head>`)
 - `js/zoom-nav.js` — on the homepage, clicking About, Projects or the camera flies through the artwork into the sky first
-- `js/camera.js` — the camera half-buried in the homepage sand, drawn in the artwork's letters; it links to Travels
 - `about/`, `projects/` — one `index.html` per section, so URLs are `/about/` etc. (research lives on the About page)
-- `travels/` — reached only from the camera in the sand (not in the nav)
+- `travels/` — reached only from the camera half-buried in the homepage sand (an unlabelled easter egg, not in the nav;
+  the camera is a thin-line SVG in `index.html`, styled in `css/style.css`)
 - `css/style.css` — the only stylesheet
 - `archive/` — previous versions of the site, kept for reference
   - `2024-music-site/` — the original music-and-merch site (build.py + templates)
@@ -55,9 +55,6 @@ places on every page. Clicking About or Projects on the homepage zooms into the 
 word clicked (it grows and fades as it comes past), the letters fading before they get large, until only
 that sky and its stars are left; then the page's text fades in. The camera in the sand does the same,
 flying into the sand, and opens Travels. People who prefer reduced motion go straight there.
-
-The camera is drawn into the artwork's letter grid through a small hook in `js/night-tide.js`
-(`window.nightTideExtras`), so the scene itself is unchanged and night still matches the original.
 
 ## Publish
 
