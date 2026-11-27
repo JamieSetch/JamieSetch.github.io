@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <title>Homepage speed test</title>
+    <link rel="stylesheet" href="/css/style.css?v=perf" />
+    <script>window.__perf = { acc: {}, last: 0, draws: 0 };</script>
+    <script src="/js/time-of-day.js?v=perf"></script>
+    <style>
+      #perf { position: fixed; top: 8px; left: 8px; z-index: 10; background: rgba(0,0,0,.85); color: #fff;
+        font: 13px/1.45 Menlo, monospace; padding: 10px 12px; white-space: pre; border: 1px solid #fff; }
+    </style>
+  </head>
+  <body class="home">
+    <div class="tide-frame"><canvas id="night-tide"></canvas></div>
+    <div id="perf">Starting the speed test… keep this tab in front for about 50 seconds.</div>
+    <script src="/js/night-tide-perf.js?v=perf" defer></script>
+    <script>
+      window.addEventListener("load", () => setTimeout(() => {
+        const P = window.__perf, out = document.getElementById("perf");
+        const configs = [
+          { name: "as live" },
+          { name: "no blur filter", noFilter: 1 },
+          { name: "no glow at all", noGlow: 1 },
+          { name: "no sand layer", noGround: 1 },
+          { name: "sand, low quality", lowQuality: 1 },
+          { name: "1x pixels", scale1: 1 },
+          { name: "1x pixels, no glow", scale1: 1, noGlow: 1 },
+          { name: "as live + GPU wait", flush: 1 },
+          { name: "FIX: js glow", jsGlow: 1 },
+          { name: "FIX: js glow, low sand", jsGlow: 1, lowQuality: 1 },
+        ];
+        const stages = ["scene", "fade", "glyphs", "putImageData", "sky", "ground", "lettersDraw", "blur", "glowDraw", "gpuFlush"];
+        const short = ["scene", "fade", "glyph", "putImg", "sky", "sand", "letters", "blur", "glowDr", "gpu"];
+        const rows = [];
+        const pad = (x, n) => String(x).padStart(n);
+        function render(status) {
+          const [w, h, c, r, sc] = P.size || [0, 0, 0, 0, 0];
+          let s = `${navigator.userAgent.match(/(Version\/[\d.]+ )?(Safari|Chrome|Firefox)\/[\d.]+/)?.[0] || ""}\n`;
+          s += `screen x${window.devicePixelRatio}, canvas ${w}x${h}, grid ${c}x${r}, cell scale ${sc}\n\n`;
+          s += "config               fps " + short.map((x) => pad(x, 7)).join("") + "   total ms\n";
+          for (const row of rows) {
+            const tot = stages.reduce((a, k) => a + row.st[k], 0);
+            s += row.name.padEnd(20) + pad(row.fps.toFixed(1), 5) + stages.map((k) => pad(row.st[k].toFixed(1), 7)).join("") + pad(tot.toFixed(1), 10) + "\n";
+          }
+          out.textContent = s + "\n" + status;
+        }
+        let k = 0;
+        function run() {
+          const cfg = configs[k];
+          for (const f of ["noFilter", "noGlow", "noGround", "lowQuality", "scale1", "flush", "jsGlow"]) P[f] = !!cfg[f];
+          P.forceSetup = true;
+          render(`testing "${cfg.name}" (${k + 1} of ${configs.length})…`);
+          setTimeout(() => {
+            P.acc = {}; P.draws = 0;
+            const t0 = performance.now();
+            setTimeout(() => {
+              const secs = (performance.now() - t0) / 1000, n = Math.max(1, P.draws);
+              rows.push({ name: cfg.name, fps: P.draws / secs, st: Object.fromEntries(stages.map((x) => [x, (P.acc[x] || 0) / n])) });
+              if (++k < configs.length) run();
+              else render("Done. fps is frames per second (30 is the target); the other columns are milliseconds per frame.");
+            }, 4000);
+          }, 1000);
+        }
+        // ?only=jsGlow (or any flag) holds one setting without the timing run, for comparing looks
+        const only = new URLSearchParams(location.search).get("only");
+        if (only !== null) { if (only) P[only] = true; P.forceSetup = true; out.remove(); return; }
+        run();
+      }, 500));
+    </script>
+  </body>
+</html>
