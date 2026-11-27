@@ -1,6 +1,6 @@
 # Jamie Setch — research portfolio
 
-A plain static site: no build step, no dependencies.
+A plain static site: no build step, no dependencies. Live at https://jamiesetch.github.io
 
 ## Structure
 
@@ -44,6 +44,18 @@ waves have just been (catching the sea's light, gold at dusk, with a few glints)
 
 To preview a time, add `?hour=` to the address, e.g. http://localhost:8090/?hour=13 or `?hour=19`.
 The colours and times live in the "time of day" block near the top of `js/night-tide.js`.
+
+## Publish
+
+The live site is GitHub Pages, served from the `main` branch of
+[JamieSetch/JamieSetch.github.io](https://github.com/JamieSetch/JamieSetch.github.io) (git remote `live`).
+Work happens on `research-portfolio`; to publish it:
+
+```bash
+git push live research-portfolio:main
+```
+
+The live site updates a minute or two later. `.nojekyll` tells GitHub to serve the files as they are.
 
 ## After changing CSS or JS
 
