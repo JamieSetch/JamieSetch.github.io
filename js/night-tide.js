@@ -56,9 +56,9 @@
   const DAWN = {
     colors: [[44, 30, 70], [66, 44, 98], [96, 62, 124], [136, 86, 146], [184, 118, 160], [226, 160, 176],
       [240, 200, 200], [255, 226, 200], [246, 226, 232], [130, 96, 104], [200, 180, 210]],
-    top: [16, 16, 44], horizon: [92, 56, 96], sea: [10, 10, 26], wetSand: [44, 34, 44], sand: [86, 68, 74],
-    shallow: [0, 0, 0], shallowMix: 0,
-    gain: 1.05, glitter: 0.6, stars: 0.3, sheen: 0.45, sandGlint: 0.7,
+    top: [16, 16, 44], horizon: [92, 56, 96], sea: [10, 10, 26], wetSand: [72, 56, 64], sand: [132, 108, 108],
+    shallow: [112, 92, 140], shallowMix: 0.7, // clear lavender water over sand
+    gain: 1.05, glitter: 0.6, stars: 0.3, sheen: 0.3, sandGlint: 0.45,
   };
   const DAY = {
     colors: [[10, 60, 96], [14, 86, 126], [20, 116, 156], [36, 150, 184], [84, 188, 210], [150, 222, 232],
@@ -70,9 +70,9 @@
   const DUSK = {
     colors: [[40, 22, 60], [70, 32, 82], [110, 44, 98], [160, 64, 100], [214, 102, 88], [244, 156, 96],
       [250, 196, 150], [255, 222, 150], [252, 222, 204], [176, 116, 78], [210, 180, 200]],
-    top: [22, 12, 44], horizon: [120, 52, 58], sea: [14, 8, 24], wetSand: [52, 32, 36], sand: [104, 66, 56],
-    shallow: [0, 0, 0], shallowMix: 0,
-    gain: 1.05, glitter: 0.58, stars: 0.4, sheen: 0.6, sandGlint: 1,
+    top: [22, 12, 44], horizon: [120, 52, 58], sea: [14, 8, 24], wetSand: [82, 52, 46], sand: [152, 106, 80],
+    shallow: [150, 84, 72], shallowMix: 0.6, // clear water over sand, catching the sunset
+    gain: 1.05, glitter: 0.58, stars: 0.4, sheen: 0.45, sandGlint: 0.6,
   };
   // (hour, light): blends smoothly between neighbours
   const DAY_KEYS = [[0, NIGHT], [4.5, NIGHT], [6, DAWN], [8, DAY], [17, DAY], [19, DUSK], [20.5, NIGHT], [24, NIGHT]];
