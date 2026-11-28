@@ -7,7 +7,6 @@ A plain static site: no build step, no dependencies. Live at https://jamiesetch.
 - `index.html` — home page: the animated artwork *NIGHT TIDE* fills the window, with the nav in white in its night sky
 - `js/night-tide.js` — JavaScript port of JIN2's `night_tide.py` that draws the homepage animation
 - `js/time-of-day.js` — the time-of-day colours and the twinkling stars, shared by every page (loaded in each page's `<head>`)
-- `js/zoom-nav.js` — on the homepage, clicking About or Projects flies through the artwork into the sky first
 - `about/`, `projects/` — one `index.html` per section, so URLs are `/about/` etc. (research lives on the About page)
 - `travels/` — not linked from anywhere yet (it was reached from a camera in the homepage sand, since removed)
 - `css/style.css` — the only stylesheet
@@ -50,9 +49,7 @@ from its top down to just above the horizon (stopping there keeps the white text
 `?hour=` works on them too. Without JavaScript they show the night sky: black.
 
 Stars twinkle over every page's sky whenever the homepage sky has them (night, dawn, dusk), in the same
-places on every page. Clicking About or Projects on the homepage zooms into the artwork towards the
-word clicked (it grows and fades as it comes past), the letters fading before they get large, until only
-that sky and its stars are left; then the page's text fades in. People who prefer reduced motion go straight there.
+places on every page. Links open pages straight away, with no transition.
 
 ## Publish
 

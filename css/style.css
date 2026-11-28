@@ -62,20 +62,6 @@ body::before {
   mix-blend-mode: plus-lighter;
 }
 
-/* arriving from the homepage's fly-in: the sky is already there, the text fades in */
-html.arriving body > :not(.sky-stars) {
-  animation: arrive 0.9s ease-out both;
-}
-
-@keyframes arrive {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
 strong,
 b {
   font-weight: 700;
@@ -276,57 +262,6 @@ body.home {
 .home nav a:focus-visible {
   color: #fff;
   text-decoration: underline;
-}
-
-/*
- * Clicking About or Projects on the homepage flies into the
- * artwork towards the word clicked (js/zoom-nav.js sets --fly-x/--fly-y):
- * the word grows and fades as it comes past, the letters fade, and only the
- * sky and its stars are left, the background of the page it opens. The
- * artwork fades out before it grows large, so bright water never fills the
- * screen.
- */
-body.zooming .tide-frame {
-  transform-origin: var(--fly-x, 50%) var(--fly-y, 11%);
-  animation: fly-in 1.2s cubic-bezier(0.5, 0, 0.85, 0.4) forwards;
-}
-
-body.zooming nav a {
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-body.zooming nav a.fly-target {
-  opacity: 1;
-  animation: word-in 1s cubic-bezier(0.5, 0, 0.85, 0.4) forwards;
-}
-
-@keyframes fly-in {
-  0% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  30% {
-    opacity: 1;
-  }
-  80% {
-    opacity: 0;
-  }
-  100% {
-    transform: scale(5);
-    opacity: 0;
-  }
-}
-
-@keyframes word-in {
-  0% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(6);
-    opacity: 0;
-  }
 }
 
 /* Read by screen readers and search engines, not shown */

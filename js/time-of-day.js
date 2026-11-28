@@ -97,19 +97,10 @@
   paintSky();
   setInterval(paintSky, 60 * 1000);
 
-  // Arriving from the homepage's fly-in (js/zoom-nav.js): the sky and stars
-  // are already there, and the page's text fades in over them.
-  try {
-    if (sessionStorage.getItem("arriving") === "1") {
-      sessionStorage.removeItem("arriving");
-      root.classList.add("arriving");
-    }
-  } catch {}
 
   // Stars: NIGHT TIDE's scattered ASCII stars, spread over the whole
   // background of every page and twinkling the same way. They fade out by
-  // day. On the homepage they sit hidden behind the artwork until a link
-  // flies through it into the sky (js/zoom-nav.js).
+  // day. (On the homepage they sit hidden behind the artwork.)
   const STAR_CHANCE = 0.003, BIG_STAR = 0.0008; // per cell, as in the homepage sky
   const still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
