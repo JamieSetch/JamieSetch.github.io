@@ -100,7 +100,7 @@
 
   // Stars: NIGHT TIDE's scattered ASCII stars, spread over the whole
   // background of every page and twinkling the same way. They fade out by
-  // day. (On the homepage they sit hidden behind the artwork.)
+  // day. (Not on the homepage, whose artwork has its own.)
   const STAR_CHANCE = 0.003, BIG_STAR = 0.0008; // per cell, as in the homepage sky
   const still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -112,6 +112,8 @@
   }
 
   function startStars() {
+    // the homepage's artwork covers the whole window and draws its own stars
+    if (document.body.classList.contains("home")) return;
     const cvs = document.createElement("canvas");
     cvs.className = "sky-stars";
     cvs.setAttribute("aria-hidden", "true");

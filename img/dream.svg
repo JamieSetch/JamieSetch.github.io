@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Dream MCP: the sleepy zzZ from its logo, in the logo's orange -->
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FF6B35" />
+      <stop offset="1" stop-color="#FFAA5A" />
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" fill="#000" />
+  <g fill="url(#g)" font-family="'Courier New', Courier, monospace" font-weight="700">
+    <text x="9" y="52" font-size="30">z</text>
+    <text x="28" y="37" font-size="22">z</text>
+    <text x="42" y="24" font-size="17">Z</text>
+  </g>
+</svg>

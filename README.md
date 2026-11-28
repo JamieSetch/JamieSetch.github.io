@@ -10,6 +10,7 @@ A plain static site: no build step, no dependencies. Live at https://jamiesetch.
 - `about/`, `projects/` — one `index.html` per section, so URLs are `/about/` etc. (research lives on the About page)
 - `travels/` — not linked from anywhere yet (it was reached from a camera in the homepage sand, since removed)
 - `css/style.css` — the only stylesheet
+- `img/` — the small app icons beside each project (nerve's is its app icon; Dream's and the EEG controller's are drawn to match)
 - `archive/` — previous versions of the site, kept for reference
   - `2024-music-site/` — the original music-and-merch site (build.py + templates)
   - `2026-03-rebuild/` — the unfinished March 2026 shop-style rebuild

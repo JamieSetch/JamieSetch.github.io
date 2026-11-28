@@ -207,22 +207,29 @@
 
   function buildAtlas() {
     gw = CW * scale; gh = CH * scale;
+    // Every glyph goes on one strip, each in the middle of its own slot with a
+    // glyph's width of empty space either side, and the strip is read back in
+    // one go: reading glyphs back one at a time is slow in Safari. Each mask is
+    // the middle of its slot, exactly what drawing it alone would give.
+    const slot = 3 * gw;
     const c = document.createElement("canvas");
-    c.width = gw; c.height = gh;
+    c.width = slot * CHARS.length; c.height = gh;
     const g = c.getContext("2d", { willReadFrequently: true });
+    g.fillStyle = "#000"; g.fillRect(0, 0, c.width, gh);
     g.font = `${FONT_PX * scale}px Consolas, Menlo, "DejaVu Sans Mono", "Courier New", monospace`;
     g.textAlign = "center";
     g.textBaseline = "middle";
+    g.fillStyle = "#fff";
+    for (let k = 0; k < CHARS.length; k++) g.fillText(CHARS[k], k * slot + gw + gw / 2, gh / 2 + 0.5 * scale);
+    const d = g.getImageData(0, 0, c.width, gh).data;
     atlas = [];
-    for (const ch of CHARS) {
-      g.fillStyle = "#000"; g.fillRect(0, 0, gw, gh);
-      g.fillStyle = "#fff"; g.fillText(ch, gw / 2, gh / 2 + 0.5 * scale);
-      const d = g.getImageData(0, 0, gw, gh).data;
-      const m = new Uint8Array(gw * gh);
-      for (let p = 0; p < m.length; p++) m[p] = d[p * 4];
+    for (let k = 0; k < CHARS.length; k++) {
+      const m = new Uint8Array(gw * gh), x0 = k * slot + gw;
+      for (let y = 0; y < gh; y++) for (let x = 0; x < gw; x++) m[y * gw + x] = d[(y * c.width + x0 + x) * 4];
       atlas.push(m);
     }
   }
+
 
   // -------------------------------------------------------------- the scene
 
@@ -641,7 +648,7 @@
   // ------------------------------------------------------------------- loop
 
   const still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  let t = 0, last = 0, raf = 0, visible = true;
+  let t = 0, last = 0, raf = 0, visible = true, begun = false;
 
   function stillFrame() {
     // a single moment with waves breaking, for people who prefer less motion
@@ -662,21 +669,28 @@
   }
 
   function start() {
-    if (still || raf) return;
+    if (still || raf || !begun) return;
     last = 0;
     raf = requestAnimationFrame(tick);
   }
 
   function relayout() {
-    if (setup()) {
+    if (begun && setup()) {
       if (still) stillFrame();
       else draw(t);
     }
   }
 
-  setup();
-  if (still) stillFrame();
-  else { draw(t); start(); }
+  // Build the artwork just after the page first paints, so the headings and
+  // the black background show straight away: the first frame takes a moment,
+  // a little longer in Safari, which sets up canvas text on first use.
+  function begin() {
+    begun = true;
+    setup();
+    if (still) stillFrame();
+    else { draw(t); start(); }
+  }
+  requestAnimationFrame(() => setTimeout(begin, 0));
 
   if ("ResizeObserver" in window) {
     let pending = 0;

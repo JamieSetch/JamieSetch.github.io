@@ -17,8 +17,8 @@
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&display=swap"
     />
-    <link rel="stylesheet" href="/css/style.css?v=2026-11-28a" />
-    <script src="/js/time-of-day.js?v=2026-11-28a"></script>
+    <link rel="stylesheet" href="/css/style.css?v=2026-11-28c" />
+    <script src="/js/time-of-day.js?v=2026-11-28c"></script>
   </head>
   <body>
     <header role="banner">
@@ -33,17 +33,20 @@
     <hr />
     <main id="main" role="main">
       <section class="entry">
-        <h2><a href="https://nervelabs.co.uk/" target="_blank" rel="noopener">nerve</a></h2>
+        <h2 class="with-icon">
+          <img class="app-icon" src="/img/nerve.png" alt="" />
+          <a href="https://nervelabs.co.uk/" target="_blank" rel="noopener">nerve</a>
+        </h2>
         <p>
           A no-code spiking neural network IDE for simulating and deploying
-          brain-inspired AI on edge hardware. I founded it and lead its
-          development.
+          brain-inspired AI on edge hardware.
         </p>
         <p class="date">2025–present · Founder</p>
       </section>
 
       <section class="entry">
-        <h2>
+        <h2 class="with-icon">
+          <img class="app-icon" src="/img/eeg.svg" alt="" />
           <a href="https://github.com/JamieSetch/BCI-Game-Controller-EEG-" target="_blank" rel="noopener"
             >Multipurpose EEG controller</a
           >
@@ -59,7 +62,8 @@
       </section>
 
       <section class="entry">
-        <h2>
+        <h2 class="with-icon">
+          <img class="app-icon" src="/img/dream.svg" alt="" />
           <a href="https://github.com/JamieSetch/Dream-MCP" target="_blank" rel="noopener">Dream MCP</a>
         </h2>
         <p>An automatic, persistent memory for Claude Code, built as an MCP server.</p>
@@ -68,7 +72,7 @@
       <!--
         One entry per project:
         <section class="entry">
-          <h2>Project name</h2>
+          <h2 class="with-icon"><img class="app-icon" src="/img/icon.png" alt="" /> Project name</h2>
           <p>What it is, in a sentence or two.</p>
           <p class="date">Years · Kind of project</p>
         </section>
