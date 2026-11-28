@@ -1,6 +1,6 @@
 # Jamie Setch — research portfolio
 
-A plain static site: no build step, no dependencies. Live at https://jamiesetch.github.io
+A plain static site: no build step, no dependencies. Live at https://jamiesetch.com
 
 ## Structure
 
@@ -64,6 +64,10 @@ git push live research-portfolio:main
 ```
 
 The live site updates a minute or two later. `.nojekyll` tells GitHub to serve the files as they are.
+
+The domain: `CNAME` tells GitHub Pages to serve the site at jamiesetch.com. Its DNS is on Cloudflare
+(registered with GoDaddy): two CNAME records, `@` and `www`, point to `jamiesetch.github.io`, both
+"DNS only" (grey cloud) so GitHub can issue the HTTPS certificate. jamiesetch.github.io redirects to it.
 
 ## After changing CSS or JS
 
