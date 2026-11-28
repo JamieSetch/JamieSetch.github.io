@@ -183,7 +183,11 @@
     canvas.width = cols * CW * scale;
     canvas.height = rows * CH * scale;
     img = ctx.createImageData(canvas.width, canvas.height);
-    px32 = new Uint32Array(img.data.buffer);
+    // A signed view, so every pixel value stays a 32-bit integer: with the
+    // alpha byte set, unsigned values are too big for that, and Safari's
+    // optimised code keeps bailing out and recompiling on them (a second or
+    // two of stutter after the page loads). The bytes are exactly the same.
+    px32 = new Int32Array(img.data.buffer);
     px32.fill(0xff000000);
     art = document.createElement("canvas");
     art.width = canvas.width; art.height = canvas.height;
@@ -543,14 +547,49 @@
 
   // ---------------------------------------------------------------- drawing
 
+  // The two pixel loops are kept as small functions of their own: Safari
+  // optimises small functions quickly, so the first frames after the page
+  // loads don't crawl while it works on one big one (see also warmUp).
+
+  // fade the trail to half
+  function fadeTrail(px) {
+    for (let p = 0; p < px.length; p++) px[p] = ((px[p] >> 1) & 0x007f7f7f) | 0xff000000;
+  }
+
+  // one glyph: its mask x colour, kept where brighter than the fading trail
+  function blitGlyph(px, rowStride, x0, y0, mask, w, h, cr, cg, cb) {
+    for (let gy = 0; gy < h; gy++) {
+      let p = (y0 + gy) * rowStride + x0;
+      const mo = gy * w;
+      for (let gx = 0; gx < w; gx++, p++) {
+        const mv = mask[mo + gx];
+        if (mv === 0) continue;
+        const m = mv / 255;
+        const nr = (cr * m) | 0, ng = (cg * m) | 0, nb = (cb * m) | 0;
+        const v = px[p];
+        const or = v & 255, og = (v >> 8) & 255, ob = (v >> 16) & 255;
+        px[p] = 0xff000000 | ((nb > ob ? nb : ob) << 16) | ((ng > og ? ng : og) << 8) | (nr > or ? nr : or);
+      }
+    }
+  }
+
+  // Run both on a small scratch buffer before the first real frame, so
+  // Safari starts optimising them while the page is still just black.
+  function warmUp() {
+    const px = new Int32Array(64 * 64), mask = new Uint8Array(12 * 18).fill(160);
+    for (let k = 0; k < 300; k++) {
+      fadeTrail(px);
+      blitGlyph(px, 64, (k % 4) * 12, (k % 3) * 18, mask, 12, 18, 200, 180, 160);
+    }
+  }
+
   // glyph mask x colour x brightness, over a fading copy of the previous frame
   function draw(t) {
     light = lightAt(clockHour());
     frame(t);
     const palette = light.colors;
 
-    // fade the trail to half
-    for (let p = 0; p < px32.length; p++) px32[p] = ((px32[p] >>> 1) & 0x007f7f7f) | 0xff000000;
+    fadeTrail(px32);
 
     const rowStride = canvas.width;
     for (let r = 0; r < rows; r++) {
@@ -561,22 +600,7 @@
         const l = lumA[i] < 0 ? 0 : lumA[i] > 1 ? 1 : lumA[i];
         if (l <= 0) continue;
         const col = palette[tagA[i]] || palette[0];
-        const cr = col[0] * l, cg = col[1] * l, cb = col[2] * l;
-        const mask = atlas[ch];
-        const x0 = c * gw, y0 = r * gh;
-        for (let gy = 0; gy < gh; gy++) {
-          let p = (y0 + gy) * rowStride + x0;
-          const mo = gy * gw;
-          for (let gx = 0; gx < gw; gx++, p++) {
-            const mv = mask[mo + gx];
-            if (mv === 0) continue;
-            const m = mv / 255;
-            const nr = (cr * m) | 0, ng = (cg * m) | 0, nb = (cb * m) | 0;
-            const v = px32[p];
-            const or = v & 255, og = (v >>> 8) & 255, ob = (v >>> 16) & 255;
-            px32[p] = (0xff000000 | ((nb > ob ? nb : ob) << 16) | ((ng > og ? ng : og) << 8) | (nr > or ? nr : or)) >>> 0;
-          }
-        }
+        blitGlyph(px32, rowStride, c * gw, r * gh, atlas[ch], gw, gh, col[0] * l, col[1] * l, col[2] * l);
       }
     }
     actx.putImageData(img, 0, 0);
@@ -686,6 +710,7 @@
   // a little longer in Safari, which sets up canvas text on first use.
   function begin() {
     begun = true;
+    warmUp();
     setup();
     if (still) stillFrame();
     else { draw(t); start(); }
