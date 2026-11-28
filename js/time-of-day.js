@@ -1,12 +1,13 @@
 /*
- * Time of day for the whole site: the light follows each visitor's local
- * clock. The homepage artwork (js/night-tide.js) takes its palette, sky, sea
- * and sand from here, and every other page uses the same sky as its
- * background.
+ * Time of day for the whole site: the light follows the real day in England,
+ * with dawn and dusk at London's sunrise and sunset for the date, so it shifts
+ * a little every day through the year. The homepage artwork
+ * (js/night-tide.js) takes its palette, sky, sea and sand from here, and every
+ * other page uses the same sky as its background.
  *
  * Night is NIGHT TIDE's original look exactly; dawn, day and dusk are new for
  * the site and only change colours, never the waves. Preview any time by
- * adding ?hour=13.5 to the address.
+ * adding ?hour=13.5 (England time) and/or ?date=2026-06-21 to the address.
  *
  * Load this in each page's <head> (not deferred), after the theme-color meta
  * tag, so the sky is set before the page first paints.
@@ -44,14 +45,84 @@
     shallow: [150, 84, 72], shallowMix: 0.6, // clear water over sand, catching the sunset
     gain: 1.05, glitter: 0.58, stars: 0.4, sheen: 0.45, sandGlint: 0.05,
   };
-  // (hour, light): blends smoothly between neighbours
-  const DAY_KEYS = [[0, NIGHT], [4.5, NIGHT], [6, DAWN], [8, DAY], [17, DAY], [19, DUSK], [20.5, NIGHT], [24, NIGHT]];
+  // When each light happens follows the real day in England, for everyone,
+  // whatever their own time zone: dawn is centred on London's sunrise and dusk
+  // on its sunset for the date, so the timings shift a little every day
+  // through the year (long June evenings, short December days).
+  // Preview with ?hour=13.5 (England time) and ?date=2026-06-21.
+  const LAT = 51.5074, LON = -0.1278; // London
+  const params = new URLSearchParams((window.location && window.location.search) || "");
+
+  // the time in England (GMT or BST, switching on the right days)
+  let england = null;
+  try {
+    england = new Intl.DateTimeFormat("en-GB", {
+      timeZone: "Europe/London", hourCycle: "h23",
+      year: "numeric", month: "numeric", day: "numeric", hour: "numeric", minute: "numeric", second: "numeric",
+    });
+  } catch {}
+
+  // [year, month, day, hour as a fraction] in England at a moment
+  function inEngland(when) {
+    if (!england) {
+      // a very old browser without time zones: the visitor's own clock
+      return [when.getFullYear(), when.getMonth() + 1, when.getDate(),
+        when.getHours() + when.getMinutes() / 60 + when.getSeconds() / 3600];
+    }
+    const p = {};
+    for (const { type, value } of england.formatToParts(when)) p[type] = +value;
+    return [p.year, p.month, p.day, p.hour + p.minute / 60 + p.second / 3600];
+  }
+
+  // London's sunrise and sunset on a date, as hours on England's clock
+  // (the standard sunrise equation, good to a minute or so)
+  function sunriseSunset(y, m, d) {
+    const r = Math.PI / 180, sin = (x) => Math.sin(x * r), cos = (x) => Math.cos(x * r);
+    const n = Math.ceil(Date.UTC(y, m - 1, d, 12) / 86400000 + 2440587.5 - 2451545 + 0.0008);
+    const J = n + LON / 360; // mean solar time
+    const M = (357.5291 + 0.98560028 * J) % 360; // the sun's mean anomaly
+    const L = (M + 1.9148 * sin(M) + 0.02 * sin(2 * M) + 0.0003 * sin(3 * M) + 282.9372) % 360; // ecliptic longitude
+    const noon = 2451545 + J + 0.0053 * sin(M) - 0.0069 * sin(2 * L); // solar noon, Julian day
+    const decl = Math.asin(sin(L) * sin(23.4397)) / r;
+    const cosW = (sin(-0.833) - sin(LAT) * sin(decl)) / (cos(LAT) * cos(decl));
+    const w = Math.acos(Math.max(-1, Math.min(1, cosW))) / r; // half the day, in degrees
+    const hour = (jd) => inEngland(new Date((jd - 2440587.5) * 86400000))[3];
+    return [hour(noon - w / 360), hour(noon + w / 360)];
+  }
+
+  // (hour, light) for a date: blends smoothly between neighbours
+  let keysDate = "", keys = null;
+  function keysFor(y, m, d) {
+    const date = `${y}-${m}-${d}`;
+    if (date !== keysDate) {
+      const [rise, set] = sunriseSunset(y, m, d);
+      keys = [[0, NIGHT], [rise - 1.5, NIGHT], [rise, DAWN], [rise + 2, DAY],
+        [set - 2, DAY], [set, DUSK], [set + 1.5, NIGHT], [24, NIGHT]];
+      keysDate = date;
+    }
+    return keys;
+  }
+
+  // today's date in England (or ?date=), checked at most once a minute
+  const forcedDate = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(params.get("date") || "");
+  let todayAt = -1e9, today = null;
+  function englandToday() {
+    if (forcedDate) return [+forcedDate[1], +forcedDate[2], +forcedDate[3]];
+    const now = Date.now();
+    if (now - todayAt > 60 * 1000) {
+      today = inEngland(new Date(now)).slice(0, 3);
+      todayAt = now;
+    }
+    return today;
+  }
 
   const lerp = (a, b, u) => a + (b - a) * u;
   const mix3 = (a, b, u) => [lerp(a[0], b[0], u), lerp(a[1], b[1], u), lerp(a[2], b[2], u)];
   const rgb = (c) => `rgb(${Math.round(c[0])}, ${Math.round(c[1])}, ${Math.round(c[2])})`;
 
+  // the light at an hour on England's clock, today
   function lightAt(hour) {
+    const DAY_KEYS = keysFor(...englandToday());
     const h = ((hour % 24) + 24) % 24;
     let k = 0;
     while (k < DAY_KEYS.length - 2 && h > DAY_KEYS[k + 1][0]) k++;
@@ -70,14 +141,14 @@
   }
 
   const forcedHour = (() => {
-    const q = new URLSearchParams((window.location && window.location.search) || "").get("hour");
+    const q = params.get("hour");
     return q !== null && q.trim() !== "" && Number.isFinite(+q) ? +q : null;
   })();
 
+  // the hour now on England's clock (or ?hour=)
   function clockHour() {
     if (forcedHour !== null) return forcedHour;
-    const d = new Date();
-    return d.getHours() + d.getMinutes() / 60 + d.getSeconds() / 3600;
+    return inEngland(new Date())[3];
   }
 
   // Page background: the sky from its top down to just above the horizon.

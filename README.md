@@ -39,16 +39,20 @@ moments in the 20-second loop). Visitors who have reduced motion switched on see
 
 ### Time of day
 
-The light follows each visitor's local clock. Night (20:30–04:30) is JIN2's original exactly; around that
-it blends through dawn (06:00), day (08:00–17:00) and dusk (19:00). Only the colours, the sky, sea and sand
+The light follows the real day in England, for every visitor whatever their time zone (England's clock,
+GMT or BST). Dawn is centred on London's sunrise and dusk on its sunset for the date, worked out in
+`js/time-of-day.js`, so the timings shift a little every day: night until 1½ hours before sunrise, dawn at
+sunrise, full day from 2 hours after sunrise until 2 hours before sunset, dusk at sunset, and night again
+1½ hours after it. Night is JIN2's original exactly. Only the colours, the sky, sea and sand
 behind the letters, the amount of glitter and the stars change, never the waves. By dawn, day and dusk,
 sand shows through the shallows in patches and covers the beach (bottom ~14%), wet and dark where the
 waves have just been (catching the sea's light, gold at dusk, with a few glints) and drier further up; at night it stays black like the original.
 
-To preview a time, add `?hour=` to the address, e.g. http://localhost:8090/?hour=13 or `?hour=19`.
+To preview a time, add `?hour=` (England time) to the address, e.g. http://localhost:8090/?hour=13, and
+`?date=` to see another day of the year, e.g. `?date=2026-06-21&hour=21` for a midsummer sunset.
 The colours and times live in `js/time-of-day.js`. The other pages use the same sky as their background,
 from its top down to just above the horizon (stopping there keeps the white text readable at midday), so
-`?hour=` works on them too. Without JavaScript they show the night sky: black.
+`?hour=` and `?date=` work on them too. Without JavaScript they show the night sky: black.
 
 Stars twinkle over every page's sky whenever the homepage sky has them (night, dawn, dusk), in the same
 places on every page. Links open pages straight away, with no transition.
